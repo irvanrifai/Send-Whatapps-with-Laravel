@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormController;
@@ -16,13 +17,5 @@ use App\Http\Controllers\HomeController;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Route::get('/form-send', [FormController::class, 'index']);
-Route::post('/form-send', [FormController::class, 'store']);
+Route::get('/', [ClientController::class, 'index']);
+Route::resource('/broadcast', ClientController::class);

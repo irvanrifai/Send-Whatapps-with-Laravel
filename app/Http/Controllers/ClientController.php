@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
+use App\Trait\WablasTrait;
 
 class ClientController extends Controller
 {
@@ -13,9 +17,26 @@ class ClientController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $data = User::latest();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($data) {
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $data->id . '" data-original-title="Edit" class="edit" id="editItem"><span class="badge bg-warning text-dark"><i class="fa fa-pencil"></i></span></a>';
+
+                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $data->id . '" data-original-title="Delete" class="delete" id="deleteItem"><span class="badge bg-danger"><i
+                    class="fa fa-trash"></i></span></a>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        $data = User::latest()->get();
+        return view('form_send', [
+            'data' => $data
+        ]);
     }
 
     /**
@@ -36,7 +57,45 @@ class ClientController extends Controller
      */
     public function store(StoreClientRequest $request)
     {
-        //
+        function gantiformat($nomorhp)
+        {
+            //Terlebih dahulu kita trim dl
+            $nomorhp = trim($nomorhp);
+            //bersihkan dari karakter yang tidak perlu
+            $nomorhp = strip_tags($nomorhp);
+            // Berishkan dari spasi
+            $nomorhp = str_replace(" ", "", $nomorhp);
+            // bersihkan dari bentuk seperti  (022) 66677788
+            $nomorhp = str_replace("(", "", $nomorhp);
+            // bersihkan dari format yang ada titik seperti 0811.222.333.4
+            $nomorhp = str_replace(".", "", $nomorhp);
+
+            //cek apakah mengandung karakter + dan 0-9
+            if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                // cek apakah no hp karakter 1-3 adalah +62
+                if (substr(trim($nomorhp), 0, 3) == '+62') {
+                    $nomorhp = trim($nomorhp);
+                }
+                // cek apakah no hp karakter 1 adalah 0
+                elseif (substr($nomorhp, 0, 1) == '0') {
+                    $nomorhp = '+62' . substr($nomorhp, 1);
+                }
+            }
+            return $nomorhp;
+        }
+
+        $kumpulan_data = [];
+
+        $data['phone'] = gantiformat(request('no_wa'));
+        $data['message'] = request('pesan');
+        $data['secret'] = false;
+        $data['retry'] = false;
+        $data['isGroup'] = false;
+        array_push($kumpulan_data, $data);
+
+        WablasTrait::sendText($kumpulan_data);
+
+        return redirect()->back();
     }
 
     /**

@@ -2,12 +2,20 @@
 <html lang="en">
 
 <head>
-    <title>Bootstrap Example</title>
+    <title>Broadcast</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="https://kit.fontawesome.com/8186c4a2d4.js" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
 </head>
 
 <body>
@@ -19,18 +27,20 @@
     <hr>
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <div class="form-group">
                     <label for="\">No WA</label>
                     <input type="text" name="no_wa"
                         class="form-control" id="" placeholder="No WA">
                 </div>
+                <a type="button" href="javascript:void(0)" class="btn btn-primary my-3 btn-sm bg-blue-500"
+                    id="createCategory"><i class="fa fa-plus"></i>
+                    Add data
+                </a>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
                             <tr>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col"></th>
@@ -41,7 +51,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 <form action="{{ url('form-send') }}" method="POST">
                     @csrf
                     <div class="form-group">
@@ -49,7 +59,7 @@
                         <textarea name="pesan" class="form-control"
                             cols="30" rows="5" placeholder="Pesan"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send</button>
+                    <button type="submit" class="btn btn-primary text-right">Send</button>
                 </form>
             </div>
         </div>
@@ -68,7 +78,7 @@
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: '{{ url('admin/category') }}',
+                    url: '{{ url('/') }}',
                 },
                 columns: [{
                         render: function(data, type, row, meta) {
@@ -76,24 +86,19 @@
                         }
                     },
                     {
-                        data: 'id',
-                        name: 'id',
-                        title: 'ID Category',
-                    },
-                    {
                         data: 'name',
                         name: 'name',
                         title: 'Name',
                     },
                     {
-                        data: 'create_at',
-                        name: 'create_at',
-                        title: 'Create',
+                        data: 'email',
+                        name: 'email',
+                        title: 'Email',
                     },
                     {
-                        data: 'update_at',
-                        name: 'update_at',
-                        title: 'Update',
+                        data: 'phone',
+                        name: 'phone',
+                        title: 'WhatApps',
                     },
                     {
                         data: 'action',
@@ -117,12 +122,14 @@
             // to affect an action with modal
             $('body').on('click', '#editItem', function() {
                 var data_id = $(this).data('id');
-                $.get("{{ url('admin/category') }}" + '/' + data_id + '/edit', function(data) {
+                $.get("{{ url('broadcast') }}" + '/' + data_id + '/edit', function(data) {
                     $('#modelHeading').html("Edit Item");
                     $('#saveBtn').html("Update");
                     $('#ajaxModel').modal('show');
                     $('#data_id').val(data.id);
                     $('#name').val(data.name);
+                    $('#email').val(data.email);
+                    $('#phone').val(data.phone);
                 })
             });
 
@@ -133,7 +140,7 @@
 
                 $.ajax({
                     data: $('#form_data').serialize(),
-                    url: "{{ url('admin/category') }}",
+                    url: "{{ url('broadcast') }}",
                     type: "POST",
                     dataType: 'json',
                     enctype: 'multipart/form-data',
@@ -159,7 +166,7 @@
 
                 if (result) {
                     $.ajax({
-                        url: "{{ url('admin/category') }}" + '/' + data_id,
+                        url: "{{ url('broadcast') }}" + '/' + data_id,
                         type: "delete",
                         data: {
                             id: data_id,
@@ -192,6 +199,69 @@
             });
         });
     </script>
+
+    {{-- modal for action --}}
+    <div class="modal fade" id="ajaxModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modelHeading"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form novalidate action="{{ url('admin/category') }}" role="form" method="POST"
+                    enctype="multipart/form-data" id="form_data" class="needs-validation">
+                    @csrf
+                    <input type="hidden" name="data_id" id="data_id">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="row mb-2 g-3">
+                                <div class="mb-3 col-md-6 form-group">
+                                    <label for="name" class="form-label">Name</label><span
+                                        class="text-danger">*</span>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        name="name" id="name" placeholder="Category" required
+                                        value="{{ old('name') }}">
+                                    @error('name')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3 col-md-6 form-group">
+                                    <label for="email" class="form-label">Email</label><span
+                                        class="text-danger">*</span>
+                                    <input type="text" class="form-control @error('email') is-invalid @enderror"
+                                        name="email" id="email" placeholder="Category" required
+                                        value="{{ old('email') }}">
+                                    @error('email')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3 col-md-6 form-group">
+                                    <label for="phone" class="form-label">WhatApps</label><span
+                                        class="text-danger">*</span>
+                                    <input type="text" class="form-control @error('phone') is-invalid @enderror"
+                                        name="phone" id="phone" placeholder="Category" required
+                                        value="{{ old('phone') }}">
+                                    @error('phone')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="bi bi-plus-square btn btn-primary bg-blue-500" id="saveBtn"
+                            value="create"><i class="fa fa-plus"></i> </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 </body>
 
