@@ -55,7 +55,7 @@ class ClientController extends Controller
      * @param  \App\Http\Requests\StoreClientRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreClientRequest $request)
+    public function store()
     {
         function gantiformat($nomorhp)
         {
@@ -104,7 +104,7 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function show(Client $client)
+    public function show(User $user)
     {
         //
     }
@@ -115,9 +115,10 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function edit(Client $client)
+    public function edit(User $user)
     {
-        //
+        $data = User::find($user->id);
+        return response()->json($data);
     }
 
     /**
@@ -127,7 +128,7 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(User $user)
     {
         //
     }
@@ -138,8 +139,9 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Client $client)
+    public function destroy(User $user)
     {
-        //
+        $data = User::where('id', $user->id)->delete();
+        return response()->json($data);
     }
 }
