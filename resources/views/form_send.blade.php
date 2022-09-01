@@ -33,7 +33,7 @@
 <body>
 
     <div class="text-center">
-        <h1 class="text-lg">Broadcast pesan Whatsapp</h1>
+        <h1 class="text-lg">Broadcast Pesan Whatsapp</h1>
         <p>Mengirim pesan Broadcast dengan laravel dan Whatsapp gateway dari WABLAS</p>
     </div>
     <hr>
@@ -63,7 +63,6 @@
                     Add data
                 </a>
                 <a href="javascript:void(0)" class="btn btn-success bg-green-500" id="check">Cek data</a>
-                <a href="javascript:void(0)" class="btn btn-danger bg-red-600" id="send">Send data</a>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
@@ -233,30 +232,20 @@
                 $(this).toggleClass('selected');
             });
 
-            // button for inform amount of table selected
-            $('#check').click(function() {
-                alert(table.rows('.selected').data().length + ' row(s) selected');
-                var data_id = $(this).data('id');
-                $.get("{{ url('/broadcast') }}" + '/' + data_id + '/edit', function(data) {
-                    alert(table.rows('.selected').val(data.name));
-                    $('#name').val(data.name);
-                    $('#email').val(data.email);
-                    $('#phone').val(data.phone);
-                })
-            });
-
-            $('#send').click(function(e, dt, node, config) {
+            $('#check').click(function(e, dt, node, config) {
                 var data = $('#tb_datatable').DataTable().rows('.selected').data().toArray();
 
-                e.preventDefault();
-                $(this).html('Sending..');
 
                 var arrayPhone = [];
                 for (var i = 0; i < data.length; i++) {
                     arrayPhone.push(data[i].phone);
                 }
                 var sData = arrayPhone.join();
-                console.log(arrayPhone);
+                alert(table.rows('.selected').data().length + ' row(s) selected');
+                alert(arrayPhone);
+
+                e.preventDefault();
+                $(this).html('Sending..');
 
                 $.ajax({
                     type: 'POST',
@@ -268,6 +257,9 @@
                     success: function(data) {
                         alert(json);
                         console.log(json);
+                    },
+                    error: function(data) {
+                        console.log('Error:', data);
                     }
                 });
             });
