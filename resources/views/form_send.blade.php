@@ -66,9 +66,6 @@
                 <a href="javascript:void(0)" class="btn btn-success bg-green-500" id="check">Cek data</a>
                 <label for="/">Select single or multiple row table then type a message, click send
                     button!</label>
-                <div>
-                    <input type="hidden" name="manyPhone" id="manyPhone">
-                </div>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
@@ -84,7 +81,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <form action="{{ url('sendBroadcast') }}" method="POST">
+                <form action="{{ url('sendBroadcast') }}" method="POST" id="form_broadcast">
                     @csrf
                     {{-- send single message successfull --}}
                     <div class="form-group">
@@ -92,6 +89,12 @@
                         <input type="text"
                             name="no_wa" class="form-control" id="" placeholder="WhatApps number receiver">
                     </div>
+
+                    {{-- menampung sementara multiple number --}}
+                    <div>
+                        <input type="hidden" name="manyPhone" id="manyPhone">
+                    </div>
+
                     <div class="form-group">
                         <label for="file" class="form-label">Multiple files input</label>
                         <input class="form-control" type="file" id="file" multiple>
@@ -101,7 +104,7 @@
                         <textarea name="pesan"
                             class="form-control" cols="40" rows="5" placeholder="Type message..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send</button>
+                    <button type="submit" class="btn btn-primary" id="send">Send</button>
                 </form>
                 <hr>
                 <a href="https://sangcahaya.id/whatsapp-gateway/" target="_blank" class="text-lg">Tutorial Pengunaan
@@ -264,6 +267,7 @@
                     type: 'POST',
                     url: '{{ url('sendBroadcast') }}',
                     dataType: 'json',
+                    // data: $('#form_broadcast').serialize(),
                     data: arrayPhone,
                     // data: {
                     //     json: JSON.stringify(arrayPhone),
@@ -282,6 +286,45 @@
                     }
                 });
             });
+
+            // $('#send').click(function(e, dt, node, config) {
+            //     var data = $('#tb_datatable').DataTable().rows('.selected').data().toArray();
+
+            //     var arrayPhone = [];
+            //     for (var i = 0; i < data.length; i++) {
+            //         arrayPhone.push(data[i].phone);
+            //     }
+            //     var sData = arrayPhone.join();
+            //     alert(arrayPhone.length + ' row(s) selected');
+            //     alert(arrayPhone);
+
+            //     $('#manyPhone').val(arrayPhone);
+
+            //     e.preventDefault();
+            //     $(this).html('Sending..');
+
+            //     $.ajax({
+            //         type: 'POST',
+            //         url: '{{ url('sendBroadcast') }}',
+            //         dataType: 'json',
+            //         data: arrayPhone,
+            //         // data: {
+            //         //     json: JSON.stringify(arrayPhone),
+            //         //     // json: arrayPhone,
+            //         //     _token: '{{ csrf_token() }}'
+            //         // },
+            //         success: function(data) {
+            //             alert(data);
+            //             console.log(data);
+            //             $('#check').html('Success!');
+            //         },
+            //         error: function(data) {
+            //             alert('Failed send message');
+            //             console.log('Error:', data);
+            //             $('#check').html('Failed!');
+            //         }
+            //     });
+            // });
 
 
 
