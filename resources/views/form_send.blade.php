@@ -39,6 +39,8 @@
     </div>
     <hr>
     <div class="container">
+
+        {{-- untuk domain server & security token belum jalan --}}
         <form action="" method="post">
             <div class="row">
                 <div class="col-md-4">
@@ -66,6 +68,7 @@
                 <a href="javascript:void(0)" class="btn btn-success bg-green-500" id="check">Cek data</a>
                 <label for="/">Select single or multiple row table then type a message, click send
                     button!</label>
+                <label for="/">(cannot work for temp)</label>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
