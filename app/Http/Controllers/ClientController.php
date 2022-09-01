@@ -55,47 +55,10 @@ class ClientController extends Controller
      * @param  \App\Http\Requests\StoreClientRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
+    public function store(Request $request)
     {
-        function gantiformat($nomorhp)
-        {
-            //Terlebih dahulu kita trim dl
-            $nomorhp = trim($nomorhp);
-            //bersihkan dari karakter yang tidak perlu
-            $nomorhp = strip_tags($nomorhp);
-            // Berishkan dari spasi
-            $nomorhp = str_replace(" ", "", $nomorhp);
-            // bersihkan dari bentuk seperti  (022) 66677788
-            $nomorhp = str_replace("(", "", $nomorhp);
-            // bersihkan dari format yang ada titik seperti 0811.222.333.4
-            $nomorhp = str_replace(".", "", $nomorhp);
-
-            //cek apakah mengandung karakter + dan 0-9
-            if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
-                // cek apakah no hp karakter 1-3 adalah +62
-                if (substr(trim($nomorhp), 0, 3) == '+62') {
-                    $nomorhp = trim($nomorhp);
-                }
-                // cek apakah no hp karakter 1 adalah 0
-                elseif (substr($nomorhp, 0, 1) == '0') {
-                    $nomorhp = '+62' . substr($nomorhp, 1);
-                }
-            }
-            return $nomorhp;
-        }
-
-        $kumpulan_data = [];
-
-        $data['phone'] = gantiformat(request('no_wa'));
-        $data['message'] = request('pesan');
-        $data['secret'] = false;
-        $data['retry'] = false;
-        $data['isGroup'] = false;
-        array_push($kumpulan_data, $data);
-
-        WablasTrait::sendText($kumpulan_data);
-
-        return redirect()->back();
+        $data = User::updateOrCreate(['id' => $request->data_id], ['name' => $request->name], ['email' => $request->email], ['phone' => $request->phone]);
+        return response()->json($data);
     }
 
     /**
@@ -143,5 +106,48 @@ class ClientController extends Controller
     {
         $data = User::where('id', $user->id)->delete();
         return response()->json($data);
+    }
+
+    public function broadcast_wa()
+    {
+        function gantiformat($nomorhp)
+        {
+            //Terlebih dahulu kita trim dl
+            $nomorhp = trim($nomorhp);
+            //bersihkan dari karakter yang tidak perlu
+            $nomorhp = strip_tags($nomorhp);
+            // Berishkan dari spasi
+            $nomorhp = str_replace(" ", "", $nomorhp);
+            // bersihkan dari bentuk seperti  (022) 66677788
+            $nomorhp = str_replace("(", "", $nomorhp);
+            // bersihkan dari format yang ada titik seperti 0811.222.333.4
+            $nomorhp = str_replace(".", "", $nomorhp);
+
+            //cek apakah mengandung karakter + dan 0-9
+            if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                // cek apakah no hp karakter 1-3 adalah +62
+                if (substr(trim($nomorhp), 0, 3) == '+62') {
+                    $nomorhp = trim($nomorhp);
+                }
+                // cek apakah no hp karakter 1 adalah 0
+                elseif (substr($nomorhp, 0, 1) == '0') {
+                    $nomorhp = '+62' . substr($nomorhp, 1);
+                }
+            }
+            return $nomorhp;
+        }
+
+        $kumpulan_data = [];
+
+        $data['phone'] = gantiformat(request('no_wa'));
+        $data['message'] = request('pesan');
+        $data['secret'] = false;
+        $data['retry'] = false;
+        $data['isGroup'] = false;
+        array_push($kumpulan_data, $data);
+
+        WablasTrait::sendText($kumpulan_data);
+
+        return redirect()->back();
     }
 }

@@ -17,7 +17,7 @@
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
-    {{-- <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> --}}
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     {{-- bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -36,16 +36,13 @@
     <hr>
     <div class="container">
         <div class="row">
-            <div class="col-md-7">
-                <div class="form-group">
-                    <label for="\">No WA</label>
-                    <input type="text" name="no_wa"
-                        class="form-control" id="" placeholder="No WA">
-                </div>
-                <a type="button" href="javascript:void(0)" class="btn btn-primary my-3 btn-sm bg-blue-500"
-                    id="createCategory"><i class="fa fa-plus"></i>
+            <div class="col-md-7 mx-1">
+                <a type="button" href="javascript:void(0)" class="btn btn-primary my-3 bg-blue-500" id="create"><i
+                        class="fa fa-plus"></i>
                     Add data
                 </a>
+                <a href="javascript:void(0)" class="btn btn-success bg-green-500" id="check">Cek data</a>
+                <a href="javascript:void(0)" class="btn btn-danger bg-red-600" id="send">Send data</a>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
@@ -60,16 +57,29 @@
                     </table>
                 </div>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="\">No WA</label>
+                    <input type="text" name="no_wa"
+                        class="form-control" id="" placeholder="No WA">
+                </div>
                 <form action="{{ url('form-send') }}" method="POST">
                     @csrf
                     <div class="form-group">
+                        <label for="file" class="form-label">Multiple files input</label>
+                        <input class="form-control" type="file" id="file" multiple>
+                    </div>
+                    <div class="form-group">
                         <label for="\">Pesan</label>
                         <textarea name="pesan" class="form-control"
-                            cols="30" rows="5" placeholder="Pesan"></textarea>
+                            cols="40" rows="5" placeholder="Pesan"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary text-right">Send</button>
+                    <button type="submit" class="btn btn-primary">Send</button>
                 </form>
+                <hr>
+                <a href="https://sangcahaya.id/whatsapp-gateway/" target="_blank" class="text-lg">Tutorial pengunaan
+                    |</a>
+                <a href="https://wablas.com/" target="_blank" class="text-lg"> WABLAS Server</a>
             </div>
         </div>
     </div>
@@ -120,7 +130,7 @@
             });
 
             // button to add new category
-            $('#createCategory').click(function() {
+            $('#create').click(function() {
                 $('#saveBtn').html("Add");
                 $('#data_id').val('');
                 $('#form_data').trigger("reset");
@@ -202,10 +212,56 @@
                 $(this).toggleClass('selected');
             });
 
-            // button for inform amount of table selected (not used)
-            $('#button').click(function() {
+            // button for inform amount of table selected
+            $('#check').click(function() {
                 alert(table.rows('.selected').data().length + ' row(s) selected');
+                var data_id = $(this).data('id');
+                $.get("{{ url('/broadcast') }}" + '/' + data_id + '/edit', function(data) {
+                    alert(table.rows('.selected').val(data.name));
+                    $('#name').val(data.name);
+                    $('#email').val(data.email);
+                    $('#phone').val(data.phone);
+                })
             });
+
+            $('#send').click(function(e, dt, node, config) {
+                // function saveData() {
+                var table = $('#tb_datatable').DataTable();
+                var tableData = table.rows('.selected ').data().toArray();
+                // var tableData = table.rows('.selected ').data();
+
+                e.preventDefault();
+                $(this).html('Sending..');
+                console.log(tableData)
+
+                var newarray = [];
+                for (var i = 0; i < tableData.length; i++) {
+                    // alert("Name: " + tableData[i][2] + " Email: " + tableData[i][3] + " Phone: " +
+                    //     tableData[i][5]);
+                    newarray.push(tableData[i][0]);
+                    newarray.push(tableData[i][1]);
+                    newarray.push(tableData[i][2]);
+                }
+
+                var sData = newarray.join();
+
+                console.log(newarray);
+
+                // alert(tableData);
+                // $.ajax({
+                //     type: 'POST',
+                //     url: '{{ url('broadcast') }}',
+                //     dataType: 'json',
+                //     data: {
+                //         json: JSON.stringify(tableData)
+                //     },
+                //     success: function(data) {
+                //         alert(json);
+                //         console.log(json);
+                //     }
+                // });
+            });
+            // };
         });
     </script>
 
