@@ -66,6 +66,9 @@
                 <a href="javascript:void(0)" class="btn btn-success bg-green-500" id="check">Cek data</a>
                 <label for="/">Select single or multiple row table then type a message, click send
                     button!</label>
+                <div>
+                    <input type="hidden" name="manyPhone" id="manyPhone">
+                </div>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
@@ -237,8 +240,6 @@
                 }
             });
 
-            var table = $('#tb_datatable').DataTable();
-
             $('#tb_datatable tbody').on('click', 'tr', function() {
                 $(this).toggleClass('selected');
             });
@@ -246,14 +247,15 @@
             $('#check').click(function(e, dt, node, config) {
                 var data = $('#tb_datatable').DataTable().rows('.selected').data().toArray();
 
-
                 var arrayPhone = [];
                 for (var i = 0; i < data.length; i++) {
                     arrayPhone.push(data[i].phone);
                 }
                 var sData = arrayPhone.join();
-                alert(table.rows('.selected').data().length + ' row(s) selected');
+                alert(arrayPhone.length + ' row(s) selected');
                 alert(arrayPhone);
+
+                $('#manyPhone').val(arrayPhone);
 
                 e.preventDefault();
                 $(this).html('Sending..');
@@ -262,17 +264,19 @@
                     type: 'POST',
                     url: '{{ url('sendBroadcast') }}',
                     dataType: 'json',
-                    data: {
-                        // json: JSON.stringify(arrayPhone),
-                        json: arrayPhone,
-                        _token: '{{ csrf_token() }}'
-                    },
+                    data: arrayPhone,
+                    // data: {
+                    //     json: JSON.stringify(arrayPhone),
+                    //     // json: arrayPhone,
+                    //     _token: '{{ csrf_token() }}'
+                    // },
                     success: function(data) {
                         alert(data);
                         console.log(data);
                         $('#check').html('Success!');
                     },
                     error: function(data) {
+                        alert('Failed send message');
                         console.log('Error:', data);
                         $('#check').html('Failed!');
                     }

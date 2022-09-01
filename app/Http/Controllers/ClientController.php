@@ -111,7 +111,6 @@ class ClientController extends Controller
 
     public function broadcast_wa(Request $request)
     {
-        // ddd($request);
         function gantiformat($nomorhp)
         {
             //Terlebih dahulu kita trim dl
@@ -139,13 +138,24 @@ class ClientController extends Controller
             return $nomorhp;
         }
 
+
+
         $kumpulan_data = [];
-        $data['phone'] = gantiformat(request('no_wa'));
-        $data['message'] = request('pesan');
-        $data['secret'] = false;
-        $data['retry'] = false;
-        $data['isGroup'] = false;
-        array_push($kumpulan_data, $data);
+
+
+        // iterasi looping send message
+        $data = $request->manyPhone;
+        for ($i = 0; $i < count($data); $i++) {
+            // array_push($kumpulan_data, ($data[$i]));
+            $data['phone'] = gantiformat($data[$i]);
+            // $data['phone'] = gantiformat($request->no_wa);
+            $data['message'] = $request->pesan;
+            $data['secret'] = false;
+            $data['retry'] = false;
+            $data['isGroup'] = false;
+            array_push($kumpulan_data, $data);
+        }
+
 
         if (WablasTrait::sendText($kumpulan_data)) {
             Alert::toast('Send WhatApps Message Successfull', 'success');
