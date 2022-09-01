@@ -9,6 +9,7 @@ use Yajra\DataTables\DataTables;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Trait\WablasTrait;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ClientController extends Controller
 {
@@ -136,7 +137,6 @@ class ClientController extends Controller
             }
             return $nomorhp;
         }
-
         $kumpulan_data = [];
 
         $data['phone'] = gantiformat(request('no_wa'));
@@ -147,7 +147,7 @@ class ClientController extends Controller
         array_push($kumpulan_data, $data);
 
         WablasTrait::sendText($kumpulan_data);
-
+        Alert::toast('Send WhatApps Message Successfull', 'success');
         return redirect()->back();
     }
 }

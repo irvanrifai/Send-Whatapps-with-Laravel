@@ -9,6 +9,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
+    {{-- tailwind css CDN --}}
+    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+
     <script src="https://kit.fontawesome.com/8186c4a2d4.js" crossorigin="anonymous"></script>
 
     {{-- datatable --}}
@@ -30,11 +33,29 @@
 <body>
 
     <div class="text-center">
-        <h1>Broadcast pesan Whatsapp</h1>
+        <h1 class="text-lg">Broadcast pesan Whatsapp</h1>
         <p>Mengirim pesan Broadcast dengan laravel dan Whatsapp gateway dari WABLAS</p>
     </div>
     <hr>
     <div class="container">
+        <form action="" method="post">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="domain">Domain Server</label>
+                        <input type="text" name="domain" class="form-control" id="domain"
+                            placeholder="Domain Server WABLAS">
+                    </div>
+                    <div class="form-group">
+                        <label for="security_token">Security Token</label>
+                        <input type="text" name="security_token" class="form-control" id="security_token"
+                            placeholder="Security Token WABLAS">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Set Up</button>
+                </div>
+            </div>
+        </form>
+        <hr>
         <div class="row">
             <div class="col-md-7 mx-1">
                 <a type="button" href="javascript:void(0)" class="btn btn-primary my-3 bg-blue-500" id="create"><i
@@ -57,14 +78,14 @@
                     </table>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label for="\">No WA</label>
-                    <input type="text" name="no_wa"
-                        class="form-control" id="" placeholder="No WA">
-                </div>
+            <div class="col-md-4">
                 <form action="{{ url('form-send') }}" method="POST">
                     @csrf
+                    <div class="form-group">
+                        <label for="\">No WA</label>
+                        <input type="text" name="no_wa"
+                            class="form-control" id="" placeholder="No WA">
+                    </div>
                     <div class="form-group">
                         <label for="file" class="form-label">Multiple files input</label>
                         <input class="form-control" type="file" id="file" multiple>
@@ -77,7 +98,7 @@
                     <button type="submit" class="btn btn-primary">Send</button>
                 </form>
                 <hr>
-                <a href="https://sangcahaya.id/whatsapp-gateway/" target="_blank" class="text-lg">Tutorial pengunaan
+                <a href="https://sangcahaya.id/whatsapp-gateway/" target="_blank" class="text-lg">Tutorial Pengunaan
                     |</a>
                 <a href="https://wablas.com/" target="_blank" class="text-lg"> WABLAS Server</a>
             </div>
@@ -225,42 +246,34 @@
             });
 
             $('#send').click(function(e, dt, node, config) {
-                // function saveData() {
-                var table = $('#tb_datatable').DataTable();
-                var tableData = table.rows('.selected ').data().toArray();
-                // var tableData = table.rows('.selected ').data();
+                var data = $('#tb_datatable').DataTable().rows('.selected').data().toArray();
 
                 e.preventDefault();
                 $(this).html('Sending..');
-                console.log(tableData)
 
-                var newarray = [];
-                for (var i = 0; i < tableData.length; i++) {
-                    // alert("Name: " + tableData[i][2] + " Email: " + tableData[i][3] + " Phone: " +
-                    //     tableData[i][5]);
-                    newarray.push(tableData[i][0]);
-                    newarray.push(tableData[i][1]);
-                    newarray.push(tableData[i][2]);
+                var arrayPhone = [];
+                for (var i = 0; i < data.length; i++) {
+                    arrayPhone.push(data[i].phone);
                 }
+                var sData = arrayPhone.join();
+                console.log(arrayPhone);
 
-                var sData = newarray.join();
-
-                console.log(newarray);
-
-                // alert(tableData);
-                // $.ajax({
-                //     type: 'POST',
-                //     url: '{{ url('broadcast') }}',
-                //     dataType: 'json',
-                //     data: {
-                //         json: JSON.stringify(tableData)
-                //     },
-                //     success: function(data) {
-                //         alert(json);
-                //         console.log(json);
-                //     }
-                // });
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ url('sendBroadcast') }}',
+                    dataType: 'json',
+                    data: {
+                        json: JSON.stringify(arrayPhone)
+                    },
+                    success: function(data) {
+                        alert(json);
+                        console.log(json);
+                    }
+                });
             });
+
+
+
             // };
         });
     </script>

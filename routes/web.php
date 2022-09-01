@@ -18,5 +18,5 @@ use App\Http\Controllers\HomeController;
 */
 
 Route::get('/', [ClientController::class, 'index']);
-Route::post('/broadcast', [ClientController::class, 'broadcast_wa']);
+Route::post('/sendBroadcast', [ClientController::class, 'broadcast_wa']);
 Route::resource('/broadcast', ClientController::class);
