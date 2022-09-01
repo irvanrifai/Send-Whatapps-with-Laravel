@@ -109,8 +109,9 @@ class ClientController extends Controller
         return response()->json($data);
     }
 
-    public function broadcast_wa()
+    public function broadcast_wa(Request $request)
     {
+        // ddd($request);
         function gantiformat($nomorhp)
         {
             //Terlebih dahulu kita trim dl
@@ -137,8 +138,8 @@ class ClientController extends Controller
             }
             return $nomorhp;
         }
-        $kumpulan_data = [];
 
+        $kumpulan_data = [];
         $data['phone'] = gantiformat(request('no_wa'));
         $data['message'] = request('pesan');
         $data['secret'] = false;
@@ -146,8 +147,12 @@ class ClientController extends Controller
         $data['isGroup'] = false;
         array_push($kumpulan_data, $data);
 
-        WablasTrait::sendText($kumpulan_data);
-        Alert::toast('Send WhatApps Message Successfull', 'success');
-        return redirect()->back();
+        if (WablasTrait::sendText($kumpulan_data)) {
+            Alert::toast('Send WhatApps Message Successfull', 'success');
+            return redirect()->back();
+        } else {
+            Alert::toast('Send WhatApps Message Unsuccessfull', 'error');
+            return redirect()->back();
+        };
     }
 }

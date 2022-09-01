@@ -5,6 +5,7 @@
     <title>Broadcast</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -63,6 +64,8 @@
                     Add data
                 </a>
                 <a href="javascript:void(0)" class="btn btn-success bg-green-500" id="check">Cek data</a>
+                <label for="/">Select single or multiple row table then type a message, click send
+                    button!</label>
                 <div class="table-responsive pt-2">
                     <table id="tb_datatable" class="table">
                         <thead>
@@ -78,21 +81,22 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <form action="{{ url('form-send') }}" method="POST">
+                <form action="{{ url('sendBroadcast') }}" method="POST">
                     @csrf
+                    {{-- send single message successfull --}}
                     <div class="form-group">
-                        <label for="\">No WA</label>
-                        <input type="text" name="no_wa"
-                            class="form-control" id="" placeholder="No WA">
+                        <label for="\">Single No WA (work for temp)</label>
+                        <input type="text"
+                            name="no_wa" class="form-control" id="" placeholder="WhatApps number receiver">
                     </div>
                     <div class="form-group">
                         <label for="file" class="form-label">Multiple files input</label>
                         <input class="form-control" type="file" id="file" multiple>
                     </div>
                     <div class="form-group">
-                        <label for="\">Pesan</label>
-                        <textarea name="pesan" class="form-control"
-                            cols="40" rows="5" placeholder="Pesan"></textarea>
+                        <label for="\">Message</label>
+                        <textarea name="pesan"
+                            class="form-control" cols="40" rows="5" placeholder="Type message..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Send</button>
                 </form>
@@ -226,6 +230,13 @@
 
         // for table can selected row
         $(document).ready(function() {
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
             var table = $('#tb_datatable').DataTable();
 
             $('#tb_datatable tbody').on('click', 'tr', function() {
@@ -252,14 +263,18 @@
                     url: '{{ url('sendBroadcast') }}',
                     dataType: 'json',
                     data: {
-                        json: JSON.stringify(arrayPhone)
+                        // json: JSON.stringify(arrayPhone),
+                        json: arrayPhone,
+                        _token: '{{ csrf_token() }}'
                     },
                     success: function(data) {
-                        alert(json);
-                        console.log(json);
+                        alert(data);
+                        console.log(data);
+                        $('#check').html('Success!');
                     },
                     error: function(data) {
                         console.log('Error:', data);
+                        $('#check').html('Failed!');
                     }
                 });
             });
